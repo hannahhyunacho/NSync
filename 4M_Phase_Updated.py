@@ -768,7 +768,6 @@ del trial_data[0]
 # randomize order of the data for display
 random.shuffle(trial_data)
 
-all_unique_images = set()
 used_images = set()
 used_object_images = set()
 used_face_images = set()
@@ -776,13 +775,28 @@ all_unique_object_images = set()
 all_unique_face_images = set()
 control_list = []
 
+face_image_attended = {}
+obj_image_attended = {}
+
 # getting list of non-repeated images
 for item in trial_data:
-    all_unique_images.add(item[1])
-    all_unique_images.add(item[2])
+    curr_face_len = len(all_unique_face_images)
+    curr_obj_len = len(all_unique_object_images)
     # items can have same number if face or object so you must differentiate
     all_unique_face_images.add(item[1])
     all_unique_object_images.add(item[2])
+    
+    # keeping track of attended for the corresponding images
+    if item[0] == 'face' and len(all_unique_face_images) > curr_face_len:
+            face_image_attended[item[1]] = 1
+    elif item[0] == 'object' and len(all_unique_face_images) > curr_face_len:
+            face_image_attended[item[1]] = 0
+    
+    if item[0] == 'face' and len(all_unique_object_images) > curr_obj_len:
+            obj_image_attended[item[2]] = 0
+    elif item[0] == 'object' and len(all_unique_object_images) > curr_obj_len:
+            obj_image_attended[item[2]] = 1
+
 
 # break data into two
 
@@ -821,8 +835,8 @@ with open('./data/logs/' + expInfo['participant'] + '_mem_trial_order.csv', 'r')
     for image in images_list:
         # only take data we need
         if image[2] == 'new':
-            # abbreviate these images with n for new to get from correct dir
-            all_image_list.append([image[1], int(image[0]), 'new'])
+            # keeps track of id, cat, old/new, attended
+            all_image_list.append([image[1], int(image[0]), 'new', image[3]])
 
 # adding items in control list to list of images
 for item in control_list:
@@ -851,9 +865,16 @@ for item in all_image_list:
         all_image_list[control_index] = second
         all_image_list.insert(control_index, first)
 
-#print(len(all_image_list))
-#print(mem_trial_num)
-# mem_trial_num = len(all_image_list)
+# appending the attended variable
+for i in range(len(all_image_list)):
+    if len(all_image_list[i]) == 3:
+        if all_image_list[i][0] == 'o':
+            attended = obj_image_attended[all_image_list[i][1]]
+            all_image_list[i].append(attended)
+        elif all_image_list[i][0] == 'f':
+            attended = face_image_attended[all_image_list[i][1]]
+            all_image_list[i].append(attended)
+
 mem_trial_count = 0
 
 #print(mem_trial_num)
@@ -945,13 +966,14 @@ for thisMemory_trial in range(mem_trial_num): #number of trials
     # current_mem_image = mem_trial_order[mem_trial_count][0] #figures out this loops image ID
     # current_image_cat = mem_trial_order[mem_trial_count][1] #figures out this loops category (face or object)
     # current_image_type = mem_trial_order[mem_trial_count][2] #figures out this loops trial type (old or new)
+        # attended = mem_trial_order[mem_trial_count][3]
+
 
     current_image_cat = all_image_list[mem_trial_count][0] # get image category (face or object)
     current_mem_image = all_image_list[mem_trial_count][1] # get image id
     current_image_type = all_image_list[mem_trial_count][2] # get if image is old or new
-    # print(current_mem_image, current_image_cat, current_image_type)
-    # attended = mem_trial_order[mem_trial_count][3]
-    attended = 0
+    attended = all_image_list[mem_trial_count][3] # attended
+  
 
     mem_trial_count = mem_trial_count + 1 # updates my trial counter
 
@@ -973,8 +995,8 @@ for thisMemory_trial in range(mem_trial_num): #number of trials
     # mem_img_path = 'object_images/'
 
     #set opacity
-    mem_trial_image.setOpacity(0.5)
-    mem_trial_image_con.setOpacity(0.5)
+    # mem_trial_image.setOpacity(0.5)
+    # mem_trial_image_con.setOpacity(0.5)
 
     # ------Prepare to start Routine "mem_trial"-------
     t = 0
