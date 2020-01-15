@@ -8,7 +8,7 @@ from numpy import (sin, cos, tan, log, log10, pi, average,
 from numpy.random import random, randint, normal, shuffle
 import os  # handy system and path functions
 import sys  # to get file system encoding
-import csv # to read in csv files/logs
+import csv # to read in csv files/logs  
 from datetime import datetime # to get current date for file choosing  with 3Nback
 import random
 
@@ -16,17 +16,16 @@ import random
 
 
 #------------ MEMORY TEST PARAMETERS ------------ #
-nback_trial_num_all = 500 # number of nback trials overall
+nback_trial_num_all = 250 # number of nback trials overall
 nback_p_targets = 0.16 # percentage of targets you want
-total_targets = int(nback_trial_num_all*nback_p_targets) #80
+total_targets = int(nback_trial_num_all*nback_p_targets) # num targets, 40
 
-old_image_num = 340 # of old images
-new_image_num = 100 #number of lures
-mem_trial_num = 440 #number of memory trials total
+old_image_num = nback_trial_num_all - total_targets # of old images
+new_image_num = 84 #number of lures
+mem_trial_num = old_image_num + new_image_num #number of memory trials total
 mem_ISI = 0.5 # in seconds
 mem_trial_dur = 30 # in seconds
-mem_block_num = 4 # number of blocks
-
+mem_block_num = 3 # number of blocks (294 trials can be divided into 2, 3, 6, or 7(?) blocks)
 
 
 ####------------ EXPERIMENT SETUP------------ ####
@@ -37,7 +36,7 @@ os.chdir(_thisDir)
 
 # Store info about the experiment session
 # Store info about the experiment session
-psychopyVersion = '3.0.0b12'
+psychopyVersion = '3.2.4'
 expName = 'builder_test'  # from the Builder filename that created this script
 expInfo = {'participant': ''}
 dlg = gui.DlgFromDict(dictionary=expInfo, title=expName)
@@ -747,7 +746,7 @@ Nback_filename = ''
 for filename in os.listdir('./data'):
     root, ext = os.path.splitext(filename)
     if root.startswith(Nback_filepath) and ext == '.csv':
-        Nback_filename = filename
+        Nback_filename =  filename
 
 trial_data = []
 with open('./data/' + Nback_filename, 'r') as f:
