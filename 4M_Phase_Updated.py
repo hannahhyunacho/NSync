@@ -743,10 +743,10 @@ curr_date = datetime.today().strftime('%Y_%b_%d')
 Nback_filepath = expInfo['participant'] + '_nback_data_' + curr_date
 Nback_filename = ''
 # getting the matching file for the memory phase
-for filename in os.listdir('./data'):
-    root, ext = os.path.splitext(filename)
+for filenm in os.listdir('./data'):
+    root, ext = os.path.splitext(filenm)
     if root.startswith(Nback_filepath) and ext == '.csv':
-        Nback_filename =  filename
+        Nback_filename =  filenm
 
 trial_data = []
 with open('./data/' + Nback_filename, 'r') as f:
@@ -865,14 +865,14 @@ for item in all_image_list:
         all_image_list.insert(control_index, first)
 
 # appending the attended variable
-for i in range(len(all_image_list)):
-    if len(all_image_list[i]) == 3:
-        if all_image_list[i][0] == 'o':
-            attended = obj_image_attended[all_image_list[i][1]]
-            all_image_list[i].append(attended)
-        elif all_image_list[i][0] == 'f':
-            attended = face_image_attended[all_image_list[i][1]]
-            all_image_list[i].append(attended)
+# for i in range(len(all_image_list)):
+#     if len(all_image_list[i]) == 3:
+#         if all_image_list[i][0] == 'o':
+#             attended = obj_image_attended[all_image_list[i][1]]
+#             all_image_list[i].append(attended)
+#         elif all_image_list[i][0] == 'f':
+#             attended = face_image_attended[all_image_list[i][1]]
+#             all_image_list[i].append(attended)
 
 mem_trial_count = 0
 
@@ -971,7 +971,8 @@ for thisMemory_trial in range(mem_trial_num): #number of trials
     current_image_cat = all_image_list[mem_trial_count][0] # get image category (face or object)
     current_mem_image = all_image_list[mem_trial_count][1] # get image id
     current_image_type = all_image_list[mem_trial_count][2] # get if image is old or new
-    attended = all_image_list[mem_trial_count][3] # attended
+    attended = 1
+    # attended = all_image_list[mem_trial_count][3] # attended
   
 
     mem_trial_count = mem_trial_count + 1 # updates my trial counter
