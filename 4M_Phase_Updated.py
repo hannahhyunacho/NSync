@@ -795,8 +795,6 @@ for item in trial_data:
             obj_image_attended[item[2]] = 0
     elif item[0] == 'object' and len(all_unique_object_images) > curr_obj_len:
             obj_image_attended[item[2]] = 1
-
-
 # break data into two
 
 count = 0
@@ -827,6 +825,7 @@ for i in range(len(rand_object_images)):
 # combine for all images
 all_image_list = rand_face_images + rand_object_images
 
+new_images = []
 # adding new images to list of images
 with open('./data/logs/' + expInfo['participant'] + '_mem_trial_order.csv', 'r') as f:
     # reading the csv file line by line
@@ -836,6 +835,7 @@ with open('./data/logs/' + expInfo['participant'] + '_mem_trial_order.csv', 'r')
         if image[2] == 'new':
             # keeps track of id, cat, old/new, attended
             all_image_list.append([image[1], int(image[0]), 'new', image[3]])
+            new_images.append([image[1], int(image[0]), 'new', image[3]])
 
 # adding items in control list to list of images
 for item in control_list:
@@ -863,6 +863,7 @@ for item in all_image_list:
 
         all_image_list[control_index] = second
         all_image_list.insert(control_index, first)
+        
 
 # appending the attended variable
 # for i in range(len(all_image_list)):
@@ -875,7 +876,7 @@ for item in all_image_list:
 #             all_image_list[i].append(attended)
 
 mem_trial_count = 0
-
+mem_trial_num = len(all_image_list)
 #print(mem_trial_num)
 # ------ MAIN MEMORY LOOP -------------#
 for thisMemory_trial in range(mem_trial_num): #number of trials
