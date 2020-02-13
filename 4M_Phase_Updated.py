@@ -785,7 +785,6 @@ for item in trial_data:
     # items can have same number if face or object so you must differentiate
     all_unique_face_images.add(item[1])
     all_unique_object_images.add(item[2])
-    print(item)
     # keeping track of attended for the corresponding images
     if item[0] == 'face' and len(all_unique_face_images) > curr_face_len:
             face_image_attended[item[1]] = [1, item[3]]
