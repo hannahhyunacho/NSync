@@ -817,10 +817,10 @@ rand_object_images = list(all_unique_object_images.difference(used_object_images
 
 # used to differentiate face and object images - could be done in one loop but this is safer
 for i in range(len(rand_face_images)):
-    rand_face_images[i] = ['f', rand_face_images[i], 'old']
+    rand_face_images[i] = ['f', rand_face_images[i], 'old', 'randomly']
 
 for i in range(len(rand_object_images)):
-    rand_object_images[i] = ['o', rand_object_images[i], 'old']
+    rand_object_images[i] = ['o', rand_object_images[i], 'old', 'randomly']
 
 # combine for all images
 all_image_list = rand_face_images + rand_object_images
@@ -833,9 +833,9 @@ with open('./data/logs/' + expInfo['participant'] + '_mem_trial_order.csv', 'r')
     for image in images_list:
         # only take data we need
         if image[2] == 'new':
-            # keeps track of id, cat, old/new, attended
-            all_image_list.append([image[1], int(image[0]), 'new', image[3]])
-            new_images.append([image[1], int(image[0]), 'new', image[3]])
+            # keeps track of cat, id, old/new, presented w/o order or randomly, attended
+            all_image_list.append([image[1], int(image[0]), 'new', 'randomly', image[3]])
+            new_images.append([image[1], int(image[0]), 'new', 'randomly', image[3]])
 
 # adding items in control list to list of images
 for item in control_list:
@@ -854,26 +854,24 @@ for item in all_image_list:
         # if the target cat is face, show face first, if it is object, show object first
         if (item[0] == 'face'):
             # append with abbreviation to know correct dir for image
-            first,second = ['f', item[1], 'old'], ['o', item[2], 'old']
+            first,second = ['f', item[1], 'old', 'ordered'], ['o', item[2], 'old', 'ordered']
         elif (item[0] == 'object'):
-            first,second = ['o', item[2], 'old'], ['f', item[1], 'old']
+            first,second = ['o', item[2], 'old', 'ordered'], ['f', item[1], 'old', 'ordered']
         else:
             print('Error, non face or object element found')
             break
-
         all_image_list[control_index] = second
         all_image_list.insert(control_index, first)
-        
 
 # appending the attended variable
-# for i in range(len(all_image_list)):
-#     if len(all_image_list[i]) == 3:
-#         if all_image_list[i][0] == 'o':
-#             attended = obj_image_attended[all_image_list[i][1]]
-#             all_image_list[i].append(attended)
-#         elif all_image_list[i][0] == 'f':
-#             attended = face_image_attended[all_image_list[i][1]]
-#             all_image_list[i].append(attended)
+for i in range(len(all_image_list)):
+    if (all_image_list[i][2] == 'old'):
+        if all_image_list[i][0] == 'o':
+            attended = obj_image_attended[all_image_list[i][1]]
+            all_image_list[i].append(attended)
+        elif all_image_list[i][0] == 'f':
+            attended = face_image_attended[all_image_list[i][1]]
+            all_image_list[i].append(attended)
 
 mem_trial_count = 0
 mem_trial_num = len(all_image_list)
@@ -972,8 +970,8 @@ for thisMemory_trial in range(mem_trial_num): #number of trials
     current_image_cat = all_image_list[mem_trial_count][0] # get image category (face or object)
     current_mem_image = all_image_list[mem_trial_count][1] # get image id
     current_image_type = all_image_list[mem_trial_count][2] # get if image is old or new
-    attended = 1
-    # attended = all_image_list[mem_trial_count][3] # attended
+    current_presentation_type = all_image_list[mem_trial_count][3] # get if image was presented randomly or ordered
+    attended = all_image_list[mem_trial_count][4] # attended
   
 
     mem_trial_count = mem_trial_count + 1 # updates my trial counter
@@ -1145,6 +1143,7 @@ for thisMemory_trial in range(mem_trial_num): #number of trials
     memory_trials.addData('trial_type',current_image_type)
     memory_trials.addData('correct',response_corr)
     memory_trials.addData('attended',attended)
+    memory_trials.addData('ordered', current_presentation_type)
     # ------Prepare to start Routine "mem_trial_rate"-------
     t = 0
     mem_trial_rateClock.reset()  # clock
