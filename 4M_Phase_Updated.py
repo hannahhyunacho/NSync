@@ -877,7 +877,6 @@ for i in range(len(all_image_list)):
     else:
         all_image_list[i].append('NA')
 
-print(all_image_list)
 mem_trial_count = 0
 mem_trial_num = len(all_image_list)
 #print(mem_trial_num)
