@@ -760,7 +760,7 @@ with open('./data/' + Nback_filename, 'r') as f:
                 trial[9] = int(trial[9])
             except:
                 print('header')
-            trial_data.append(trial[7:10])
+            trial_data.append(trial[7:10] + [trial[11]])
 # remove header from data list
 del trial_data[0]
 
@@ -774,6 +774,7 @@ all_unique_object_images = set()
 all_unique_face_images = set()
 control_list = []
 
+# also used to keep track of trial count
 face_image_attended = {}
 obj_image_attended = {}
 
@@ -784,19 +785,18 @@ for item in trial_data:
     # items can have same number if face or object so you must differentiate
     all_unique_face_images.add(item[1])
     all_unique_object_images.add(item[2])
-    
+    print(item)
     # keeping track of attended for the corresponding images
     if item[0] == 'face' and len(all_unique_face_images) > curr_face_len:
-            face_image_attended[item[1]] = 1
+            face_image_attended[item[1]] = [1, item[3]]
     elif item[0] == 'object' and len(all_unique_face_images) > curr_face_len:
-            face_image_attended[item[1]] = 0
+            face_image_attended[item[1]] = [0, item[3]]
     
     if item[0] == 'face' and len(all_unique_object_images) > curr_obj_len:
-            obj_image_attended[item[2]] = 0
+            obj_image_attended[item[2]] = [0, item[3]]
     elif item[0] == 'object' and len(all_unique_object_images) > curr_obj_len:
-            obj_image_attended[item[2]] = 1
+            obj_image_attended[item[2]] = [1, item[3]]
 # break data into two
-
 count = 0
 
 # creating the control list
@@ -863,16 +863,21 @@ for item in all_image_list:
         all_image_list[control_index] = second
         all_image_list.insert(control_index, first)
 
-# appending the attended variable
+# appending the attended variable and trial number to the data (NA for new images)
 for i in range(len(all_image_list)):
     if (all_image_list[i][2] == 'old'):
         if all_image_list[i][0] == 'o':
             attended = obj_image_attended[all_image_list[i][1]]
-            all_image_list[i].append(attended)
+            all_image_list[i] += attended
+#            all_image_list[i].append(attended[0])
         elif all_image_list[i][0] == 'f':
             attended = face_image_attended[all_image_list[i][1]]
-            all_image_list[i].append(attended)
+            all_image_list[i] += attended
+#            all_image_list[i].append(attended[0])
+    else:
+        all_image_list[i].append('NA')
 
+print(all_image_list)
 mem_trial_count = 0
 mem_trial_num = len(all_image_list)
 #print(mem_trial_num)
@@ -972,6 +977,7 @@ for thisMemory_trial in range(mem_trial_num): #number of trials
     current_image_type = all_image_list[mem_trial_count][2] # get if image is old or new
     current_presentation_type = all_image_list[mem_trial_count][3] # get if image was presented randomly or ordered
     attended = all_image_list[mem_trial_count][4] # attended
+    current_image_trial = all_image_list[mem_trial_count][5] # trial number
   
 
     mem_trial_count = mem_trial_count + 1 # updates my trial counter
@@ -1144,6 +1150,7 @@ for thisMemory_trial in range(mem_trial_num): #number of trials
     memory_trials.addData('correct',response_corr)
     memory_trials.addData('attended',attended)
     memory_trials.addData('ordered', current_presentation_type)
+    memory_trials.addData('NBack Trial number', current_image_trial)
     # ------Prepare to start Routine "mem_trial_rate"-------
     t = 0
     mem_trial_rateClock.reset()  # clock
