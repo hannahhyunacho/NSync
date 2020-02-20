@@ -749,7 +749,7 @@ for filenm in os.listdir('./data'):
         Nback_filename =  filenm
 
 trial_data = []
-with open('./data/' + Nback_filename, 'r') as f:
+with open('./data/' + Nback_filename, 'r', encoding='utf_8') as f:
     # reading the csv file line by line
     trials_list = csv.reader(f, delimiter=',',)
     for trial in trials_list:
@@ -826,7 +826,7 @@ all_image_list = rand_face_images + rand_object_images
 
 new_images = []
 # adding new images to list of images
-with open('./data/logs/' + expInfo['participant'] + '_mem_trial_order.csv', 'r') as f:
+with open('./data/logs/' + expInfo['participant'] + '_mem_trial_order.csv', 'r', encoding='utf_8') as f:
     # reading the csv file line by line
     images_list = csv.reader(f, delimiter=',',)
     for image in images_list:
