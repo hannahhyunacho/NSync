@@ -23,15 +23,15 @@ from psychopy import visual, core, event, monitors
 # import custom calibration/validation routine for psychopy
 from EyeLinkCoreGraphicsPsychoPy import EyeLinkCoreGraphicsPsychoPy
 
-dummyMode = True # Simulated connection to the tracker
+dummyMode = False # Simulated connection to the tracker
 # press ESCAPE twice to skip calibration/validataion
 # True means that you're not connected to the eyetracker and have to create a simulated (dummy) connection
 
 ####------------TASK PARAMETERS------------ ####
 
 #------------ NBACK PARAMETERS ------------ #
-nback_ISI = 0.75 #in seconds 0.5; (0.75)
-nback_image_dur = 1.5 #image exposure duration (1.5)
+nback_ISI = 0.1 #in seconds 0.5; (0.75)
+nback_image_dur = 0.1 #image exposure duration (1.5)
 nback_trial_dur = nback_image_dur + nback_ISI  #in seconds 
 nback_trial_num_all = 250 # number of nback trials overall
 nback_block_num = 2 # number of blocks for n-back
@@ -52,13 +52,14 @@ mem_trial_dur = 30 # in seconds
 total_cat_image_num = old_image_num + new_image_num #number of unique images for things for the whole experiment
 # total_face_image_num = nback_unique_images # number of face images needed for the nback phase (since none are needed for memory anymore)
 
-####------------ EXPERIMENT SETUP------------ ####
+###################################################
+####------------ EXPERIMENT SETUP ------------ ####
+###################################################
 
 # Ensure that relative paths start from the same directory as this script
 _thisDir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(_thisDir)
 
-# Store info about the experiment session
 # Store info about the experiment session
 psychopyVersion = '3.2.4'
 expName = 'builder_test'  # from the Builder filename that created this script
@@ -90,44 +91,38 @@ routineTimer = core.CountdownTimer()  # to track time remaining of each (non-sli
 
 
 
+###############################################
+#### ------------ EYETRACKING ------------ ####
+###############################################
 
-#### ------------ EYETRACKING ------------ #####
-
-#### SETP II: established a link to the tracker
+#### STEP II: established a link to the tracker #####################
 if not dummyMode: 
     tk = pylink.EyeLink()
 else:
     tk = pylink.EyeLink(None)
     
-    #### STEP III: Open an EDF data file 
-# here we create two folders, one for the spreadsheet type data we collect after each trial,
-# one for the EDF data file recorded by Eyelink 
+#### STEP III: Open an EDF data file to save the eye movement data ##################
+# here we create two folders, one for the spreadsheet type data we collect after each trial, one for the EDF data file recorded by Eyelink 
 if not os.path.exists('edfData'): os.mkdir('edfData')
 
-# STEP III: Open an EDF data file to save the eye movement data
 # This needs to be done early, so as to record all user interactions with the tracker
-# File name cannot exceed 8 characters
-edfFileName = '%s' %(expInfo['participant'])+'_FM.EDF' 
+edfFileName = '%s' %(expInfo['participant']) + '_NBACK.EDF' # File name cannot exceed 8 characters
 tk.openDataFile(edfFileName)
-tk.sendCommand("add_file_preamble_text 'Psychopy Object_choice'")
-
-# STEP IV: Initialize custom graphics for camera setup & drift correction
-scnWidth, scnHeight = (1920, 1080) 
+# tk.sendCommand("add_file_preamble_text 'Psychopy Object_choice'")
 
 #### STEP IV: Initialize custom graphics for camera setup & drift correction ##################
 
 # initialize a monitor object to inform Psychopy the viewing distance, monitor gamma, etc.
+scnWidth, scnHeight = (1920, 1080) # this is the dimensions of a mac desktop (or should be)
 mon = monitors.Monitor('myMon', width=32.0, distance=57.0)
-mon.setSizePix((scnWidth, scnHeight))
+mon.setSizePix((scnWidth, scnHeight)) 
+
 # for the custom calibration/validation routine to work properly, we recommend setting display units to "pix"
 win = visual.Window(size=(scnWidth, scnHeight), fullscr=True,screen=0,
     allowGUI=False, allowStencil=False, monitor=mon,color=[0,0,0], colorSpace='rgb',
     blendMode='avg', useFBO=True, units='pix')
-
 #win = visual.Window(size=(scnWidth, scnHeight), fullscr=True, monitor=mon, color='black', units='pix', colorSpace='rgb')
-# Initialize the graphics for calibration/validation
-genv = EyeLinkCoreGraphicsPsychoPy(tk, win)
-pylink.openGraphicsEx(genv)
+
 
 
 # store frame rate of monitor if we can measure it
@@ -140,80 +135,17 @@ else:
 # create a default keyboard (e.g. to check for escape)
 defaultKeyboard = keyboard.Keyboard()
 
-#### STEP V: Set up the tracker ####
-
-tk.setOfflineMode() # put tracker in offline mode before changing configuration
-tk.sendCommand('sample_rate 1000') # sampling rate of 250, 500, 1000, or 2000 (won't work for EyeLink II/I)
-
-# inform the tracker the resolution of the subject display
-# [see Eyelink Installation Guide, Section 8.4: Customizing Your PHYSICAL.INI Settings ]
-tk.sendCommand("screen_pixel_coords = 0 0 %d %d" % (scnWidth-1, scnHeight-1))
-
-# save display resolution in EDF data file for Data Viewer integration purposes
-# [see Data Viewer User Manual, Section 7: Protocol for EyeLink Data to Viewer Integration]
-tk.sendMessage("DISPLAY_COORDS = 0 0 %d %d" % (scnWidth-1, scnHeight-1))
-
-# specify the calibration type, H3, HV3, HV5, HV13 (HV = horiztonal/vertical), 
-tk.sendCommand("calibration_type = HV9") # tk.setCalibrationType('HV9') also works, see the Pylink manual
-
-#specify the proportion of subject display to calibrate/validate (OPTIONAL, useful for wide screen monitors)
-tk.sendCommand("calibration_area_proportion 0.85 0.83")
-tk.sendCommand("validation_area_proportion  0.85 0.83")
-
-#Using a button from the EyeLink Host PC gamepad to accept calibration/dirft check target (optional)
-tk.sendCommand("button_function 1 'accept_target_fixation'")
-
-# the model of the tracker, 1-EyeLink I, 2-EyeLink II, 3-Newer models (100/1000Plus/DUO)
-eyelinkVer = tk.getTrackerVersion()
-
-#turn off scenelink camera stuff (EyeLink II/I only)
-if eyelinkVer == 2: tk.sendCommand("scene_camera_gazemap = NO")
-
-# Set the tracker to parse Events using "GAZE" (or "HREF") data
-tk.sendCommand("recording_parse_type = GAZE")
-
-# Online parser configuration: 0-> standard/coginitve, 1-> sensitive/psychophysiological
-# the Parser for EyeLink I is more conservative, see below
-# [see Eyelink User Manual, Section 4.3: EyeLink Parser Configuration]
-if eyelinkVer>=2: tk.sendCommand('select_parser_configuration 0')
-else:
-    tk.sendCommand("saccade_velocity_threshold = 35")
-    tk.sendCommand("saccade_acceleration_threshold = 9500")
-
-# get Host tracking software version
-hostVer = 0
-if eyelinkVer == 3:
-    tvstr  = tk.getTrackerVersionString()
-    vindex = tvstr.find("EYELINK CL")
-    hostVer = int(float(tvstr[(vindex + len("EYELINK CL")):].strip()))
-
-# specify the EVENT and SAMPLE data that are stored in EDF or retrievable from the Link
-# See Section 4 Data Files of the EyeLink user manual
-tk.sendCommand("file_event_filter = LEFT,RIGHT,FIXATION,SACCADE,BLINK,MESSAGE,BUTTON,INPUT")
-tk.sendCommand("link_event_filter = LEFT,RIGHT,FIXATION,FIXUPDATE,SACCADE,BLINK,BUTTON,INPUT")
-if hostVer>=4: 
-    tk.sendCommand("file_sample_data  = LEFT,RIGHT,GAZE,AREA,GAZERES,STATUS,HTARGET,INPUT")
-    tk.sendCommand("link_sample_data  = LEFT,RIGHT,GAZE,GAZERES,AREA,STATUS,HTARGET,INPUT")
-else:          
-    tk.sendCommand("file_sample_data  = LEFT,RIGHT,GAZE,AREA,GAZERES,STATUS,INPUT")
-    tk.sendCommand("link_sample_data  = LEFT,RIGHT,GAZE,GAZERES,AREA,STATUS,INPUT")
-    
-    # Calibrate the camera
-calInstruct = visual.TextStim(win, text='Press ENTER twice to calibrate the tracker', color='white')
-calInstruct.draw()
-win.flip()
-event.waitKeys()
-tk.doTrackerSetup()
 
 
 
 
-
+#####################################################
 #### ------------ SET UP EXPERIMENT ------------ ####
+#####################################################
 
 # Setup the Window
 win = visual.Window(
-    size=[1440, 900], fullscr=True   , screen=0,
+    size=[scnWidth, scnHeight], fullscr=True   , screen=0,
     allowGUI=False, allowStencil=False,
     monitor='testMonitor', color=[0,0,0], colorSpace='rgb',
     blendMode='avg', useFBO=True,
@@ -283,8 +215,6 @@ def shuffle_2back(images, repeats):
     if(images[len(images)-1] in repeated_images and images[len(images)-2] not in repeated_images):  #its a problem if last element is repeated, unless last 2 are   
          images[len(images)-2], images[len(images)-1] = images[len(images)-1], images[len(images)-2]     #if last element is repeated, swap with second last
 
-    
-    
     for i in range(len(images)+repeats):
         if(images[i] in repeated_images):
             images.insert(i+2,images[i])
@@ -302,12 +232,6 @@ nback_face_list = nback_face_list[len(block_1_face):]
 block_2_face = nback_face_list[0:nback_trial_num-target_jitter[1]]
 nback_face_list = nback_face_list[len(block_2_face):]
 
-# block_3_face = nback_face_list[0:nback_trial_num-target_jitter[2]]
-# nback_face_list = nback_face_list[len(block_3_face):]
-
-# block_4_face = nback_face_list[0:nback_trial_num-target_jitter[3]]
-
-
 #stores objects into blocks
 block_1_object = nback_object_list[0:nback_trial_num-target_jitter[0]]
 nback_object_list = nback_object_list[len(block_1_object):]
@@ -315,48 +239,36 @@ nback_object_list = nback_object_list[len(block_1_object):]
 block_2_object = nback_object_list[0:nback_trial_num-target_jitter[1]]
 nback_object_list = nback_object_list[len(block_2_object):]
 
-# block_3_object = nback_object_list[0:nback_trial_num-target_jitter[2]]
-# nback_object_list = nback_object_list[len(block_3_object):]
-
-# block_4_object = nback_object_list[0:nback_trial_num-target_jitter[3]]
-
 #Shuffles face list and object list based on level
 if level == 1: # if 1 back 
     shuffle_1back(block_1_face,target_jitter[0])
     shuffle_1back(block_2_face,target_jitter[1])
-    # shuffle_1back(block_3_face,target_jitter[2])
-    # shuffle_1back(block_4_face,target_jitter[3])
     
-    nback_order_face = block_1_face + block_2_face # + block_3_face + block_4_face
+    nback_order_face = block_1_face + block_2_face
 
     shuffle_1back(block_1_object,target_jitter[0])
     shuffle_1back(block_2_object,target_jitter[1])
-    # shuffle_1back(block_3_object,target_jitter[2])
-    # shuffle_1back(block_4_object,target_jitter[3])
 
-    nback_order_ob = block_1_object + block_2_object # + block_3_object + block_4_object
+
+    nback_order_ob = block_1_object + block_2_object
     
-
 else:# IF 2 BACK THEN this
     shuffle_2back(block_1_face,target_jitter[0])
     shuffle_2back(block_2_face,target_jitter[1])
-    # shuffle_2back(block_3_face,target_jitter[2])
-    # shuffle_2back(block_4_face,target_jitter[3])
-    
-    nback_order_face = block_1_face + block_2_face # + block_3_face + block_4_face
+
+    nback_order_face = block_1_face + block_2_face
 
     shuffle_2back(block_1_object,target_jitter[0])
     shuffle_2back(block_2_object,target_jitter[1])
-    # shuffle_2back(block_3_object,target_jitter[2])
-    # shuffle_2back(block_4_object,target_jitter[3])
 
-    nback_order_ob = block_1_object + block_2_object # + block_3_object + block_4_object
+    nback_order_ob = block_1_object + block_2_object
 
 
 
 
-
+#######################################################
 #### ------------ MEMORY TEST CREATOR ------------ ####
+#######################################################
 
 #makes list of the target faces and lure faces
 list_targets_face = []
@@ -412,10 +324,6 @@ for i in range(len(old_face_list)): # adds unique identifier to face trials
                block_num = 1
             elif (j > nback_trial_num - 1) & (j < nback_trial_num * 2):
                block_num = 2
-            elif (j > (nback_trial_num*2) - 1) & (j < nback_trial_num * 3):
-                block_num = 3
-            else:
-                block_num = 4
             #figures out whether the face was attended or not
             if block_str == 'FO': # faces attended first
                 if block_num%2 == 0: #if block_num is even, faces are unattended
@@ -446,10 +354,6 @@ for i in range(len(old_object_list)): # adds unique identifier to object trials
                block_num = 1
             elif (j > nback_trial_num - 1) & (j < nback_trial_num * 2):
                block_num = 2
-            elif (j > (nback_trial_num * 2) - 1) & (j < nback_trial_num * 3):
-                block_num = 3
-            else:
-                block_num = 4
             #figures out whether the obj was attended or not
             if block_str == 'FO': # objects attended second
                 if block_num%2 == 0: #if block_num is even, obj are attended
@@ -476,7 +380,7 @@ for i in range(len(new_object_list)):
 mem_trial_order = old_face_list + new_face_list + old_object_list + new_object_list 
 shuffle(mem_trial_order)
 
-#exports csv of what imgaes to save as NEW for the memory phase !!!! this is super important
+#exports csv of what images to save as NEW for the memory phase !!!! this is super important
 
 os.chdir(os.getcwd() + '/data/logs') #set wd to data
 with open(expInfo['participant'] + '_mem_trial_order' + '.csv','w')  as f:
@@ -488,9 +392,10 @@ os.chdir(_thisDir) # changes back to main directory
 
 
 
-##############################################
-#### ------INITIALIZE OBJECTS ----------- #####
-##############################################
+
+#######################################################
+#### ------------ INITIALIZE OBJECTS ------------ #####
+#######################################################
 
 # Initialize components for Routine "nback_ITI"
 nback_ITIClock = core.Clock()
@@ -498,7 +403,7 @@ nback_ITIClock = core.Clock()
 text = visual.TextStim(win=win, name='text',
     text='+',
     font='Arial',
-    pos=(0, 0), height=20, wrapWidth=None, ori=0, 
+    pos=(0, 0), height=100, wrapWidth=None, ori=0, 
     color='white', colorSpace='rgb', opacity=1, 
     languageStyle='LTR',
     depth=5.0);
@@ -535,7 +440,6 @@ object_image = visual.ImageStim(
     color=[1,1,1], colorSpace='rgb', opacity=0.5,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-2)
-
 
 # Initialize components for Routine "mem_inst"
 mem_instClock = core.Clock()
@@ -597,9 +501,6 @@ endClock = core.Clock()
 ##############################################
 
 #determines block category order (F-O-F-O or O-F-0-F)
-
-
-
 block_type = int(expInfo['participant'])%2 
 
 if block_type == 1:
@@ -609,7 +510,7 @@ else:
    block_order = ['object','face']
    block_str = 'OF'
 
-for block_count in range(len(block_order)):# FIND_ME
+for block_count in range(len(block_order)): # FIND_ME
     block_cat = block_order[block_count]
     if block_cat == 'face':   
         target_order = nback_order_face
@@ -634,18 +535,16 @@ for block_count in range(len(block_order)):# FIND_ME
     if block_count == 1: # if second block
         nback_order_face_block = block_2_face
         nback_order_ob_block = block_2_object
-    if block_count == 2: # if third block
-        nback_order_face_block = block_3_face
-        nback_order_ob_block = block_3_object
-    if block_count == 3: # if fourth block
-        nback_order_face_block = block_4_face
-        nback_order_ob_block = block_4_object
+        
+        
 
-    ###################
-    # insert appropriate instructions loop here ####
-    ###################
+
+
+    #####################################################
+    #### ------------ INSTRUCTIONS LOOP ------------ ####
+    #####################################################
     
-    # Initialize components for Routine "demo_1_t1"
+    # Initialize components for Routine "demo_1_t1" # instructions loop?
     demo_1_t1Clock = core.Clock()
     image = visual.ImageStim(
         win=win, name='image',
@@ -780,7 +679,6 @@ for block_count in range(len(block_order)):# FIND_ME
             image_2.tStart = t
             image_2.frameNStart = frameN  # exact frame index
             image_2.setAutoDraw(True)
-            tk.sendMessage("SYNCTIME_image") # message to mark the onset of visual stimuli
 
         
         # *key_resp_3* updates
@@ -863,7 +761,6 @@ for block_count in range(len(block_order)):# FIND_ME
             image_2.tStart = t
             image_2.frameNStart = frameN  # exact frame index
             image_2.setAutoDraw(True)
-            tk.sendMessage("SYNCTIME_image") # message to mark the onset of visual stimuli
 
         
         # *key_resp_3* updates
@@ -945,7 +842,6 @@ for block_count in range(len(block_order)):# FIND_ME
             image_2.tStart = t
             image_2.frameNStart = frameN  # exact frame index
             image_2.setAutoDraw(True)
-            tk.sendMessage("SYNCTIME_image") # message to mark the onset of visual stimuli
 
         
         # *key_resp_3* updates
@@ -1001,23 +897,82 @@ for block_count in range(len(block_order)):# FIND_ME
     routineTimer.reset()
     
 
+    #### STEP V: Set up the tracker #########################
+
+    tk.setOfflineMode() # put tracker in offline mode before changing configuration
+
+    tk.sendCommand('sample_rate 1000') # sampling rate of 250, 500, 1000, or 2000 (won't work for EyeLink II/I)
+
+    # inform the tracker the resolution of the subject display
+    # [see Eyelink Installation Guide, Section 8.4: Customizing Your PHYSICAL.INI Settings ]
+    tk.sendCommand("screen_pixel_coords = 0 0 %d %d" % (scnWidth-1, scnHeight-1))
+
+    # save display resolution in EDF data file for Data Viewer integration purposes
+    # [see Data Viewer User Manual, Section 7: Protocol for EyeLink Data to Viewer Integration]
+    tk.sendMessage("DISPLAY_COORDS = 0 0 %d %d" % (scnWidth-1, scnHeight-1))
+
+    # specify the calibration type, H3, HV3, HV5, HV13 (HV = horiztonal/vertical), 
+    tk.sendCommand("calibration_type = HV9") # tk.setCalibrationType('HV9') also works, see the Pylink manual
+
+    #specify the proportion of subject display to calibrate/validate (OPTIONAL, useful for wide screen monitors)
+    tk.sendCommand("calibration_area_proportion 0.85 0.83")
+    tk.sendCommand("validation_area_proportion  0.85 0.83")
+
+    #Using a button from the EyeLink Host PC gamepad to accept calibration/dirft check target (optional)
+    tk.sendCommand("button_function 1 'accept_target_fixation'")
+
+    # the model of the tracker, 1-EyeLink I, 2-EyeLink II, 3-Newer models (100/1000Plus/DUO)
+    eyelinkVer = tk.getTrackerVersion()
+
+    #turn off scenelink camera stuff (EyeLink II/I only)
+    if eyelinkVer == 2: tk.sendCommand("scene_camera_gazemap = NO")
+
+    # Set the tracker to parse Events using "GAZE" (or "HREF") data
+    tk.sendCommand("recording_parse_type = GAZE")
+
+    # Online parser configuration: 0-> standard/coginitve, 1-> sensitive/psychophysiological
+    # the Parser for EyeLink I is more conservative, see below
+    # [see Eyelink User Manual, Section 4.3: EyeLink Parser Configuration]
+    if eyelinkVer>=2: tk.sendCommand('select_parser_configuration 0')
+    else:
+        tk.sendCommand("saccade_velocity_threshold = 35")
+        tk.sendCommand("saccade_acceleration_threshold = 9500")
+
+    # get Host tracking software version
+    hostVer = 0
+    if eyelinkVer == 3:
+        tvstr  = tk.getTrackerVersionString()
+        vindex = tvstr.find("EYELINK CL")
+        hostVer = int(float(tvstr[(vindex + len("EYELINK CL")):].strip()))
+
+    # specify the EVENT and SAMPLE data that are stored in EDF or retrievable from the Link
+    # See Section 4 Data Files of the EyeLink user manual
+    tk.sendCommand("file_event_filter = LEFT,RIGHT,FIXATION,SACCADE,BLINK,MESSAGE,BUTTON,INPUT")
+    tk.sendCommand("link_event_filter = LEFT,RIGHT,FIXATION,FIXUPDATE,SACCADE,BLINK,BUTTON,INPUT")
+    if hostVer>=4: 
+        tk.sendCommand("file_sample_data  = LEFT,RIGHT,GAZE,AREA,GAZERES,STATUS,HTARGET,INPUT")
+        tk.sendCommand("link_sample_data  = LEFT,RIGHT,GAZE,GAZERES,AREA,STATUS,HTARGET,INPUT")
+    else:          
+        tk.sendCommand("file_sample_data  = LEFT,RIGHT,GAZE,AREA,GAZERES,STATUS,INPUT")
+        tk.sendCommand("link_sample_data  = LEFT,RIGHT,GAZE,GAZERES,AREA,STATUS,INPUT")
+        
+    # Initialize the graphics for calibration/validation
+    genv = EyeLinkCoreGraphicsPsychoPy(tk, win)
+    pylink.openGraphicsEx(genv)
+
+    calInstruct = visual.TextStim(win, text='Press ENTER twice to calibrate the tracker', color='white')
+    calInstruct.draw()
+    win.flip()
+    event.waitKeys()
+    tk.doTrackerSetup()
 
 
 
-
-
-    #rsets trial count
+    # resets trial count
     nback_trial_count = 0
-    
     total_trial_count = 0
     if block_count == 1:
         total_trial_count = nback_trial_num
-    elif block_count == 2:
-        total_trial_count = nback_trial_num * 2
-    elif block_count == 3:
-        total_trial_count = nback_trial_num * 3
-
-
 
     # set up handler to look after randomisation of conditions etc
     nback_loop = data.TrialHandler(nReps=1, method='sequential', 
@@ -1027,33 +982,44 @@ for block_count in range(len(block_order)):# FIND_ME
     thisExp.addLoop(nback_loop)  # add the loop to the experiment
     thisNback_loop = nback_loop.trialList[0]  # so we can initialise stimuli with some values
 
-    
-          
-    #------ NBACK MAIN TRIAL LOOP ---------#
+
+
+    ########################################################
+    #### ------------ NBACK MAIN TRIAL LOOP ----------- ####
+    ########################################################
+
     for thisNback_loop in nback_loop: #CHANGE TO NBACK_LOOP  IN NBACK_LOOP NO CAPS
+        
+        tk.startRecording(1,1,1,1) # begins the eyetracker
+        # the comment says this specifies whether events and samples are stored in the file, and available over the link
+        # unsure what that means
+        
         currentLoop = nback_loop
 
-        
         show_face = nback_order_face_block[nback_trial_count] # what face image to show
-        show_object = nback_order_ob_block[nback_trial_count] #what ob image to sho
+        show_object = nback_order_ob_block[nback_trial_count] #what ob image to show
+        
         # ------Prepare to start Routine "nback_trial"-------
         t = 0
         nback_trialClock.reset()  # clock
         frameN = -1
         continueRoutine = True
         # update component parameters for each repeat
-        object_image.setImage('object_images/' + str(show_object) + '.png')
+        object_image.setImage('object_images/' + str(show_object) + '.jpg')
         face_image.setImage('face_images/' + str(show_face) + '.jpg')
         key_resp_nback = event.BuilderKeyResponse()
         
         # keep track of which components have finished
-        nback_trialComponents = [icon, polygon, face_image, object_image, key_resp_nback,text]
+        nback_trialComponents = [icon, polygon, face_image, object_image, key_resp_nback, text]
         for thisComponent in nback_trialComponents:
             if hasattr(thisComponent, 'status'):
                 thisComponent.status = NOT_STARTED
         
         # -------Start Routine "nback_trial"-------
         while continueRoutine:
+            
+            
+            
             # get current time
             time_elapsed = globalClock.getTime()
             time_elapsed_M = core.monotonicClock.getTime()
@@ -1067,8 +1033,7 @@ for block_count in range(len(block_order)):# FIND_ME
                 icon.tStart = t
                 icon.frameNStart = frameN  # exact frame index
                 icon.setAutoDraw(True)
-                tk.sendMessage("SYNCTIME_image") # message to mark the onset of visual stimuli
-
+                
             frameRemains = 0.0 + nback_trial_dur- win.monitorFramePeriod * 0.75  # most of one frame period left
             if icon.status == STARTED and t >= frameRemains:
                 icon.setAutoDraw(False)
@@ -1089,6 +1054,7 @@ for block_count in range(len(block_order)):# FIND_ME
                 text.tStart = t
                 text.frameNStart = frameN  # exact frame index
                 text.setAutoDraw(True)
+                tk.sendMessage("cross_f%s_o%s" % (show_face, show_object)) # message to mark the onset of fixation cross
             frameRemains = 0.0 + nback_trial_dur- win.monitorFramePeriod * 0.75  # most of one frame period left
             if text.status == STARTED and t >= frameRemains:
                 text.setAutoDraw(False)
@@ -1109,6 +1075,7 @@ for block_count in range(len(block_order)):# FIND_ME
                 face_image.tStart = t
                 face_image.frameNStart = frameN  # exact frame index
                 face_image.setAutoDraw(True)
+                tk.sendMessage("image_f%s_o%s" % (show_face, show_object)) # message to mark the onset of visual stimuli
             frameRemains = 0.0 + nback_image_dur - win.monitorFramePeriod * 0.75  # most of one frame period left
             if face_image.status == STARTED and t >= frameRemains:
                 face_image.setAutoDraw(False)
@@ -1130,8 +1097,13 @@ for block_count in range(len(block_order)):# FIND_ME
                 
                 # check for quit:
                 if "escape" in theseKeys:
+                    edfTransfer = visual.TextStim(win, text='Gaze data is transfering from EyeLink Host PC, please wait...', color='white')
+                    edfTransfer.draw()
+                    win.flip()
+                    tk.receiveDataFile(edfFileName, os.getcwd() + os.sep + 'edfData' + os.sep + edfFileName)
                     endExpNow = True
                 if len(theseKeys) > 0:  # at least one key was pressed
+                    tk.sendMessage('key_f%s_o%s_k%s' % (show_face, show_object, theseKeys[0])) # send signal eyetracker about what button was pressed
                     if key_resp_nback.keys == []:  # then this was the first keypress
                         key_resp_nback.keys = theseKeys[0]  # just the first key pressed
                         key_resp_nback.rt = key_resp_nback.clock.getTime()
@@ -1155,6 +1127,9 @@ for block_count in range(len(block_order)):# FIND_ME
                 win.flip()
         
         # -------Ending Routine "nback_trial"-------
+        
+        tk.stopRecording() # stops the eyetracker for this trial!
+        
         for thisComponent in nback_trialComponents:
             if hasattr(thisComponent, "setAutoDraw"):
                 thisComponent.setAutoDraw(False)
@@ -1232,7 +1207,7 @@ all_done = visual.ImageStim(
     texRes=128, interpolate=True, depth=0.0)
 
 
-# ------Prepare to start Routine "done_routine"-------
+# ------Prepare to start Routine "done_routine"------- # keyresp 5 corresponds to the keys in the done routine
 done_routineClock = core.Clock()
 t = 0
 done_routineClock.reset()  # clock
