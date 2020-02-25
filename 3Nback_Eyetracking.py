@@ -23,7 +23,7 @@ from psychopy import visual, core, event, monitors
 # import custom calibration/validation routine for psychopy
 from EyeLinkCoreGraphicsPsychoPy import EyeLinkCoreGraphicsPsychoPy
 
-dummyMode = False # Simulated connection to the tracker
+dummyMode = True # Simulated connection to the tracker
 # press ESCAPE twice to skip calibration/validataion
 # True means that you're not connected to the eyetracker and have to create a simulated (dummy) connection
 
@@ -538,366 +538,9 @@ for block_count in range(len(block_order)): # FIND_ME
         
         
 
-
-
-    #####################################################
-    #### ------------ INSTRUCTIONS LOOP ------------ ####
-    #####################################################
-    
-    # Initialize components for Routine "demo_1_t1" # instructions loop?
-    demo_1_t1Clock = core.Clock()
-    image = visual.ImageStim(
-        win=win, name='image',
-        image='sin', mask=None,
-        ori=0, pos=(0, 0), size=(1200,675),
-        color=[1,1,1], colorSpace='rgb', opacity=1,
-        flipHoriz=False, flipVert=False,
-        texRes=128, interpolate=True, depth=0.0)
-
-    # Initialize components for Routine "demo_2_t1"
-    demo_2_t1Clock = core.Clock()
-    image_2 = visual.ImageStim(
-        win=win, name='image_2',
-        image='sin', mask=None,
-        ori=0, pos=(0, 0), size=(1200,675),
-        color=[1,1,1], colorSpace='rgb', opacity=1,
-        flipHoriz=False, flipVert=False,
-        texRes=128, interpolate=True, depth=0.0)
-
-
-    # ------Prepare to start Routine "demo_1_t1"-------
-    t = 0
-    demo_1_t1Clock.reset()  # clock
-    frameN = -1
-    continueRoutine = True
-    # update component parameters for each repeat
-    key_resp_2 = event.BuilderKeyResponse()
-    image.setImage(inst_path + '1.jpg')
-
-    # keep track of which components have finished
-    demo_1_t1Components = [image, key_resp_2]
-    for thisComponent in demo_1_t1Components:
-        if hasattr(thisComponent, 'status'):
-            thisComponent.status = NOT_STARTED
-
-    # -------Start Routine "demo_1_t1"-------
-    while continueRoutine:
-        # get current time
-        # Create some handy timers
-        globalClock = core.Clock()  # to track the time since experiment started
-        t = demo_1_t1Clock.getTime()
-        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-        # update/draw components on each frame
-        
-        # *image* updates
-        if t >= 0.0 and image.status == NOT_STARTED:
-            # keep track of start time/frame for later
-            image.tStart = t
-            image.frameNStart = frameN  # exact frame index
-            image.setAutoDraw(True)
-            tk.sendMessage("SYNCTIME_image") # message to mark the onset of visual stimuli
-
-        
-        # *key_resp_2* updates
-        if t >= 0.0 and key_resp_2.status == NOT_STARTED:
-            # keep track of start time/frame for later
-            key_resp_2.tStart = t
-            key_resp_2.frameNStart = frameN  # exact frame index
-            key_resp_2.status = STARTED
-            # keyboard checking is just starting
-            win.callOnFlip(key_resp_2.clock.reset)  # t=0 on next screen flip
-            event.clearEvents(eventType='keyboard')
-        if key_resp_2.status == STARTED:
-            theseKeys = event.getKeys(keyList=['space', 'f', 'j'])
-            
-            # check for quit:
-            if "escape" in theseKeys:
-                endExpNow = True
-            if len(theseKeys) > 0:  # at least one key was pressed
-                key_resp_2.keys = theseKeys[-1]  # just the last key pressed
-                key_resp_2.rt = key_resp_2.clock.getTime()
-                # a response ends the routine
-                continueRoutine = False
-        
-        # check if all components have finished
-        if not continueRoutine:  # a component has requested a forced-end of Routine
-            break
-        continueRoutine = False  # will revert to True if at least one component still running
-        for thisComponent in demo_1_t1Components:
-            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-                continueRoutine = True
-                break  # at least one component has not yet finished
-        
-        # check for quit (the Esc key)
-        if endExpNow or event.getKeys(keyList=["escape"]):
-            core.quit()
-        
-        # refresh the screen
-        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-            win.flip()
-
-    # -------Ending Routine "demo_1_t1"-------
-    for thisComponent in demo_1_t1Components:
-        if hasattr(thisComponent, "setAutoDraw"):
-            thisComponent.setAutoDraw(False)
-    # check responses
-    if key_resp_2.keys in ['', [], None]:  # No response was made
-        key_resp_2.keys=None
-
-    if key_resp_2.keys != None:  # we had a response
-        thisExp.nextEntry()
-    # the Routine "demo_1_t1" was not non-slip safe, so reset the non-slip timer
-    routineTimer.reset()
-    
-    # send a message to mark the end of trial
-    tk.sendMessage('TRIAL_RESULTS')
-
-    # ------Prepare to start Routine "demo_2_t1"-------
-    t = 0
-    demo_2_t1Clock.reset()  # clock
-    frameN = -1
-    continueRoutine = True
-    # update component parameters for each repeat
-    key_resp_3 = event.BuilderKeyResponse()
-    image_2.setImage(inst_path + '2.jpg')
-    # keep track of which components have finished
-    demo_2_t1Components = [image_2, key_resp_3]
-    for thisComponent in demo_2_t1Components:
-        if hasattr(thisComponent, 'status'):
-            thisComponent.status = NOT_STARTED
-
-    # -------Start Routine "demo_2_t1"-------
-    while continueRoutine:
-        # get current time
-        t = demo_2_t1Clock.getTime()
-        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-        # update/draw components on each frame
-        
-        # *image_2* updates
-        if t >= 0.0 and image_2.status == NOT_STARTED:
-            # keep track of start time/frame for later
-            image_2.tStart = t
-            image_2.frameNStart = frameN  # exact frame index
-            image_2.setAutoDraw(True)
-
-        
-        # *key_resp_3* updates
-        if t >= 0.0 and key_resp_3.status == NOT_STARTED:
-            # keep track of start time/frame for later
-            key_resp_3.tStart = t
-            key_resp_3.frameNStart = frameN  # exact frame index
-            key_resp_3.status = STARTED
-            # keyboard checking is just starting
-            win.callOnFlip(key_resp_3.clock.reset)  # t=0 on next screen flip
-            event.clearEvents(eventType='keyboard')
-        if key_resp_3.status == STARTED:
-            theseKeys = event.getKeys(keyList=['space', 'f','j'])
-            
-            # check for quit:
-            if "escape" in theseKeys:
-                endExpNow = True
-            if len(theseKeys) > 0:  # at least one key was pressed
-                key_resp_3.keys = theseKeys[-1]  # just the last key pressed
-                key_resp_3.rt = key_resp_3.clock.getTime()
-                # a response ends the routine
-                continueRoutine = False
-        
-        # check if all components have finished
-        if not continueRoutine:  # a component has requested a forced-end of Routine
-            break
-        continueRoutine = False  # will revert to True if at least one component still running
-        for thisComponent in demo_2_t1Components:
-            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-                continueRoutine = True
-                break  # at least one component has not yet finished
-        
-        # check for quit (the Esc key)
-        if endExpNow or event.getKeys(keyList=["escape"]):
-            core.quit()
-        
-        # refresh the screen
-        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-            win.flip()
-
-    # -------Ending Routine "demo_2_t1"-------
-    for thisComponent in demo_2_t1Components:
-        if hasattr(thisComponent, "setAutoDraw"):
-            thisComponent.setAutoDraw(False)
-    # check responses
-    if key_resp_3.keys in ['', [], None]:  # No response was made
-        key_resp_3.keys=None
-
-    if key_resp_3.keys != None:  # we had a response
-
-        thisExp.nextEntry()
-    # the Routine "demo_2_t1" was not non-slip safe, so reset the non-slip timer
-    routineTimer.reset()
-    
-
-    # ------Prepare to start Routine "demo_2_t1"-------
-    t = 0
-    demo_2_t1Clock.reset()  # clock
-    frameN = -1
-    continueRoutine = True
-    # update component parameters for each repeat
-    key_resp_3 = event.BuilderKeyResponse()
-    image_2.setImage(inst_path + '3.jpg')
-    # keep track of which components have finished
-    demo_2_t1Components = [image_2, key_resp_3]
-    for thisComponent in demo_2_t1Components:
-        if hasattr(thisComponent, 'status'):
-            thisComponent.status = NOT_STARTED
-
-    # -------Start Routine "demo_2_t1"-------
-    while continueRoutine:
-        # get current time
-        t = demo_2_t1Clock.getTime()
-        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-        # update/draw components on each frame
-        
-        # *image_2* updates
-        if t >= 0.0 and image_2.status == NOT_STARTED:
-            # keep track of start time/frame for later
-            image_2.tStart = t
-            image_2.frameNStart = frameN  # exact frame index
-            image_2.setAutoDraw(True)
-
-        
-        # *key_resp_3* updates
-        if t >= 0.0 and key_resp_3.status == NOT_STARTED:
-            # keep track of start time/frame for later
-            key_resp_3.tStart = t
-            key_resp_3.frameNStart = frameN  # exact frame index
-            key_resp_3.status = STARTED
-            # keyboard checking is just starting
-            win.callOnFlip(key_resp_3.clock.reset)  # t=0 on next screen flip
-            event.clearEvents(eventType='keyboard')
-        if key_resp_3.status == STARTED:
-            theseKeys = event.getKeys(keyList=['space','f','j'])
-            
-            # check for quit:
-            if "escape" in theseKeys:
-                endExpNow = True
-            if len(theseKeys) > 0:  # at least one key was pressed
-                key_resp_3.keys = theseKeys[-1]  # just the last key pressed
-                key_resp_3.rt = key_resp_3.clock.getTime()
-                # a response ends the routine
-                continueRoutine = False
-        
-        # check if all components have finished
-        if not continueRoutine:  # a component has requested a forced-end of Routine
-            break
-        continueRoutine = False  # will revert to True if at least one component still running
-        for thisComponent in demo_2_t1Components:
-            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-                continueRoutine = True
-                break  # at least one component has not yet finished
-        
-        # check for quit (the Esc key)
-        if endExpNow or event.getKeys(keyList=["escape"]):
-            core.quit()
-        
-        # refresh the screen
-        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-            win.flip()
-
-    # -------Ending Routine "demo_2_t1"-------
-    for thisComponent in demo_2_t1Components:
-        if hasattr(thisComponent, "setAutoDraw"):
-            thisComponent.setAutoDraw(False)
-    # check responses
-    if key_resp_3.keys in ['', [], None]:  # No response was made
-        key_resp_3.keys=None
-
-    if key_resp_3.keys != None:  # we had a response
-
-        thisExp.nextEntry()
-    # the Routine "demo_2_t1" was not non-slip safe, so reset the non-slip timer
-    routineTimer.reset()
-
-    # ------Prepare to start Routine "demo_2_t1"-------
-    t = 0
-    demo_2_t1Clock.reset()  # clock
-    frameN = -1
-    continueRoutine = True
-    # update component parameters for each repeat
-    key_resp_3 = event.BuilderKeyResponse()
-    image_2.setImage(inst_path + '4.jpg')
-    # keep track of which components have finished
-    demo_2_t1Components = [image_2, key_resp_3]
-    for thisComponent in demo_2_t1Components:
-        if hasattr(thisComponent, 'status'):
-            thisComponent.status = NOT_STARTED
-
-    # -------Start Routine "demo_2_t1"-------
-    while continueRoutine:
-        # get current time
-        t = demo_2_t1Clock.getTime()
-        frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
-        # update/draw components on each frame
-        
-        # *image_2* updates
-        if t >= 0.0 and image_2.status == NOT_STARTED:
-            # keep track of start time/frame for later
-            image_2.tStart = t
-            image_2.frameNStart = frameN  # exact frame index
-            image_2.setAutoDraw(True)
-
-        
-        # *key_resp_3* updates
-        if t >= 0.0 and key_resp_3.status == NOT_STARTED:
-            # keep track of start time/frame for later
-            key_resp_3.tStart = t
-            key_resp_3.frameNStart = frameN  # exact frame index
-            key_resp_3.status = STARTED
-            # keyboard checking is just starting
-            win.callOnFlip(key_resp_3.clock.reset)  # t=0 on next screen flip
-            event.clearEvents(eventType='keyboard')
-        if key_resp_3.status == STARTED:
-            theseKeys = event.getKeys(keyList=['space','f','j'])
-            
-            # check for quit:
-            if "escape" in theseKeys:
-                endExpNow = True
-            if len(theseKeys) > 0:  # at least one key was pressed
-                key_resp_3.keys = theseKeys[-1]  # just the last key pressed
-                key_resp_3.rt = key_resp_3.clock.getTime()
-                # a response ends the routine
-                continueRoutine = False
-        
-        # check if all components have finished
-        if not continueRoutine:  # a component has requested a forced-end of Routine
-            break
-        continueRoutine = False  # will revert to True if at least one component still running
-        for thisComponent in demo_2_t1Components:
-            if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
-                continueRoutine = True
-                break  # at least one component has not yet finished
-        
-        # check for quit (the Esc key)
-        if endExpNow or event.getKeys(keyList=["escape"]):
-            core.quit()
-        
-        # refresh the screen
-        if continueRoutine:  # don't flip if this routine is over or we'll get a blank screen
-            win.flip()
-
-    # -------Ending Routine "demo_2_t1"-------
-    for thisComponent in demo_2_t1Components:
-        if hasattr(thisComponent, "setAutoDraw"):
-            thisComponent.setAutoDraw(False)
-    # check responses
-    if key_resp_3.keys in ['', [], None]:  # No response was made
-        key_resp_3.keys=None
-
-    if key_resp_3.keys != None:  # we had a response
-
-        thisExp.nextEntry()
-    # the Routine "demo_2_t1" was not non-slip safe, so reset the non-slip timer
-    routineTimer.reset()
-    
-
-    #### STEP V: Set up the tracker #########################
+    ##############################################
+    #### ------------ EYETRACKER ------------ ####
+    ##############################################
 
     tk.setOfflineMode() # put tracker in offline mode before changing configuration
 
@@ -968,6 +611,102 @@ for block_count in range(len(block_order)): # FIND_ME
 
 
 
+    ######################################################
+    #### ------------ INSTRUCTION SLIDES ------------ ####
+    ######################################################
+
+    # Initialize components for Routine "demo_1_t1" # instructions loop?
+    instrClock = core.Clock()
+    image = visual.ImageStim(
+        win=win, name='image',
+        image='sin', mask=None,
+        ori=0, pos=(0, 0), size=(1200,675),
+        color=[1,1,1], colorSpace='rgb', opacity=1,
+        flipHoriz=False, flipVert=False,
+        texRes=128, interpolate=True, depth=0.0)
+    
+    slides = ['1.jpg', '2.jpg', '3.jpg', '4.jpg']
+
+    for i in slides:
+        t = 0
+        instrClock.reset()
+        frameN = -1
+        continueRoutine = True
+        # update component parameters for each repeat
+        key_resp_instr = event.BuilderKeyResponse()
+        image.setImage(inst_path + i)
+
+        # we have two components, the image and the key response
+        instrComponents = [image, key_resp_instr]
+
+        for thisComponent in instrComponents:
+            if hasattr(thisComponent, 'status'):
+                thisComponent.status = NOT_STARTED
+
+        while continueRoutine:
+            globalClock = core.Clock() # track time since the experiment started
+            t = instrClock.getTime()
+            frameN = frameN + 1 # number of completed frames (0 is the first frame)
+
+            # for the image
+            if t >= 0.0 and image.status == NOT_STARTED:
+                image.tStart = t # exact start time
+                image.frameNStart = frameN # exact start frame index
+                image.setAutoDraw(True)
+            
+            # for the keypress
+            if t >= 0.0 and key_resp_instr.status == NOT_STARTED:
+                key_resp_instr.tStart = t # exact start time
+                key_resp_instr.frameNStart = frameN # exact start frame index
+                key_resp_instr.status = STARTED
+
+                win.callOnFlip(key_resp_instr.clock.reset) # t=0 on next screen flip
+                event.clearEvents(eventType='keyboard')
+            
+            # checking the keypresses
+            if key_resp_instr.status == STARTED:
+                theseKeys = event.getKeys(keyList=['space', 'f', 'j'])
+                # check for quit
+                if "escape" in theseKeys:
+                    endExpNow = True
+                # check the last key pressed
+                if len(theseKeys) > 0: # if a key is pressed
+                    key_resp_instr.keys = theseKeys[-1] # the last key pressed
+                    key_resp_instr.rt = key_resp_instr.clock.getTime()
+                    continueRoutine = False # a keypress ends the routine
+
+            # check if all components have finished
+            if not continueRoutine:
+                break
+            continueRoutine = False
+            for thisComponent in instrComponents: # will turn True if at least one component still running
+                if hasattr(thisComponent, "status") and thisComponent.status != FINISHED:
+                    continueRoutine = True
+                    break # at least one component has not yet finished
+            
+            # check for quit (the Esc key)
+            if endExpNow or event.getKeys(keyList=['escape']):
+                core.quit()
+            
+            # refresh the screen
+            if continueRoutine: # don't flip if this routine is over, or we'll get a blank screen
+                win.flip() 
+
+            # End the routine
+        for thisComponent in instrComponents:
+            if hasattr(thisComponent, "setAutoDraw"):
+                thisComponent.setAutoDraw(False)            # check responses
+        if key_resp_instr.keys in ['', [], None]: # no response was made
+            key_resp_instr.keys = None
+        if key_resp_instr.keys != None: # we had a response
+            thisExp.nextEntry()
+            
+        # the Routine was non-slip safe, so reset the non-slip timer # ???????
+        routineTimer.reset()
+
+
+
+
     # resets trial count
     nback_trial_count = 0
     total_trial_count = 0
@@ -1017,24 +756,21 @@ for block_count in range(len(block_order)): # FIND_ME
         
         # -------Start Routine "nback_trial"-------
         while continueRoutine:
-            
-            
-            
+
             # get current time
             time_elapsed = globalClock.getTime()
             time_elapsed_M = core.monotonicClock.getTime()
             t = nback_trialClock.getTime()
             frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
             # update/draw components on each frame
-            
-            # *icon* updates
+
+# *icon* updates
             if t >= 0.0 and icon.status == NOT_STARTED:
                 # keep track of start time/frame for later
                 icon.tStart = t
                 icon.frameNStart = frameN  # exact frame index
                 icon.setAutoDraw(True)
-                
-            frameRemains = 0.0 + nback_trial_dur- win.monitorFramePeriod * 0.75  # most of one frame period left
+            frameRemains = 0.0 + nback_trial_dur - win.monitorFramePeriod * 0.75  # most of one frame period left
             if icon.status == STARTED and t >= frameRemains:
                 icon.setAutoDraw(False)
             
@@ -1044,7 +780,7 @@ for block_count in range(len(block_order)): # FIND_ME
                 polygon.tStart = t
                 polygon.frameNStart = frameN  # exact frame index
                 polygon.setAutoDraw(True)
-            frameRemains = 0.0 + nback_image_dur- win.monitorFramePeriod * 0.75  # most of one frame period left
+            frameRemains = 0.0 + nback_image_dur - win.monitorFramePeriod * 0.75  # most of one frame period left
             if polygon.status == STARTED and t >= frameRemains:
                 polygon.setAutoDraw(False)
                 
@@ -1054,8 +790,7 @@ for block_count in range(len(block_order)): # FIND_ME
                 text.tStart = t
                 text.frameNStart = frameN  # exact frame index
                 text.setAutoDraw(True)
-                tk.sendMessage("cross_f%s_o%s" % (show_face, show_object)) # message to mark the onset of fixation cross
-            frameRemains = 0.0 + nback_trial_dur- win.monitorFramePeriod * 0.75  # most of one frame period left
+            frameRemains = 0.0 + nback_trial_dur - win.monitorFramePeriod * 0.75  # most of one frame period left
             if text.status == STARTED and t >= frameRemains:
                 text.setAutoDraw(False)
                 
@@ -1065,9 +800,11 @@ for block_count in range(len(block_order)): # FIND_ME
                 object_image.tStart = t
                 object_image.frameNStart = frameN  # exact frame index
                 object_image.setAutoDraw(True)
+                tk.sendMessage('image_f%s_o%s' % (show_face, show_object)) # send signal eyetracker about what button was pressed
             frameRemains = 0.0 + nback_image_dur - win.monitorFramePeriod * 0.75  # most of one frame period left
             if object_image.status == STARTED and t >= frameRemains:
                 object_image.setAutoDraw(False)
+                tk.sendMessage('cross_f%s_o%s' % (show_face, show_object)) # send signal eyetracker about what button was pressed
             
             # *face_image* updates
             if t >= 0.0 and face_image.status == NOT_STARTED:
@@ -1075,10 +812,10 @@ for block_count in range(len(block_order)): # FIND_ME
                 face_image.tStart = t
                 face_image.frameNStart = frameN  # exact frame index
                 face_image.setAutoDraw(True)
-                tk.sendMessage("image_f%s_o%s" % (show_face, show_object)) # message to mark the onset of visual stimuli
             frameRemains = 0.0 + nback_image_dur - win.monitorFramePeriod * 0.75  # most of one frame period left
             if face_image.status == STARTED and t >= frameRemains:
                 face_image.setAutoDraw(False)
+
             
             # *key_resp_nback* updates
             if t >= 0.0 and key_resp_nback.status == NOT_STARTED:
